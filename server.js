@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -7,15 +6,11 @@ const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 
-// Use CORS middleware for Express
 app.use(cors());
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://stellar-spacetacle.onrender.com",
-      "http://localhost:3000/"
-    
-    ], // Your front-end URL
+    origin: ["https://stellar-spacetacle.onrender.com",],
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true
@@ -25,7 +20,7 @@ const io = new Server(server, {
 let players = {};
 let lastUpdate = {};
 
-const THROTTLE_LIMIT = 100; // Adjust the throttle limit as needed (e.g., 100ms)
+const THROTTLE_LIMIT = 50; // Adjust the throttle limit as needed
 
 io.on('connection', (socket) => {
   console.log(`Player connected: ${socket.id}`);
@@ -36,12 +31,16 @@ io.on('connection', (socket) => {
       players[socket.id] = state;
       lastUpdate[socket.id] = now;
 
+      // Create a new object excluding the requesting player's state
+      const filteredPlayers = Object.keys(players)
+        .filter(id => id !== socket.id)
+        .reduce((acc, id) => {
+          acc[id] = players[id];
+          return acc;
+        }, {});
+
       // Send the update to all clients except the one that sent the state
-      for (const id in players) {
-        if (id !== socket.id) {
-          socket.to(id).emit('updatePlayers', { [socket.id]: state });
-        }
-      }
+      socket.emit('updatePlayers', filteredPlayers);
     }
   });
 
@@ -51,9 +50,6 @@ io.on('connection', (socket) => {
     io.emit('updatePlayers', players);
   });
 });
-
-
-
 
 server.listen(3001, () => {
   console.log('Server is running on port 3001');
