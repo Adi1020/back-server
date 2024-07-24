@@ -12,7 +12,10 @@ app.use(cors());
 
 const io = new Server(server, {
   cors: {
-    origin: "https://stellar-spacetacle.onrender.com", // Your front-end URL
+    origin: ["https://stellar-spacetacle.onrender.com",
+      "http://localhost:3000/"
+    
+    ], // Your front-end URL
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true
