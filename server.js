@@ -10,7 +10,7 @@ app.use(cors());
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://stellar-spacetacle.onrender.com", "http://localhost:3000"],
+    origin: ["https://stellar-spacetacle.onrender.com", "https://skyone.ofektechnology.com"],
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true
